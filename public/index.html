@@ -628,17 +628,18 @@
         }
 
         function applyVeinVanishFilter(ctx, w, h) {
-            // Multiple passes for better results
-            for (let pass = 0; pass < 3; pass++) {
+            // 5 passes for aggressive removal
+            for (let pass = 0; pass < 5; pass++) {
                 
-                // Create blurred version
+                // Create heavily blurred version (clean skin reference)
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = w;
                 tempCanvas.height = h;
                 const tempCtx = tempCanvas.getContext('2d');
                 
                 tempCtx.drawImage(ctx.canvas, 0, 0);
-                tempCtx.filter = 'blur(12px)';
+                // Heavy blur - this becomes our "clean" reference
+                tempCtx.filter = 'blur(20px)';
                 tempCtx.drawImage(tempCanvas, 0, 0);
                 tempCtx.filter = 'none';
                 
@@ -653,7 +654,7 @@
                     const g = orig[i + 1];
                     const b = orig[i + 2];
                     
-                    // Skin detection
+                    // Skin detection (broader range)
                     const brightness = (r + g + b) / 3;
                     const max = Math.max(r, g, b);
                     const min = Math.min(r, g, b);
@@ -666,49 +667,69 @@
                         if (hue < 0) hue += 360;
                     }
                     
-                    // Is this skin?
+                    // Broad skin detection
                     const isSkin = (
-                        ((hue >= 0 && hue <= 50) || (hue >= 350 && hue <= 360)) &&
-                        r > 40 && brightness > 30 && brightness < 240 &&
-                        r >= g * 0.6 && r >= b * 0.6
+                        brightness > 30 && brightness < 245 &&
+                        r > 30 && r >= b * 0.5
                     );
                     
                     if (!isSkin) continue;
                     
-                    // Vein detection
-                    const hasBlue = b > r * 0.7;
-                    const hasGreenBlue = g > r * 0.75 && b > r * 0.7;
-                    const hasRed = r > g * 1.2 && r > b * 1.2;
-                    const hasPurple = b > g * 0.85 && r > g;
-                    const hasPink = r > g * 1.1 && r > b * 1.05 && brightness > 100;
-                    const isDark = brightness < 160;
+                    // AGGRESSIVE vein detection
+                    // Red/pink spider veins
+                    const redExcess = r - Math.min(g, b);
+                    const hasRed = redExcess > 15 && r > g * 1.08;
+                    const hasPink = r > g * 1.05 && r > b * 1.05;
+                    const hasPurpleRed = r > g && b > g * 0.7;
                     
+                    // Blue/green varicose veins
+                    const blueExcess = b - Math.min(r, g);
+                    const hasBlue = blueExcess > 10 || b > r * 0.8;
+                    const hasGreen = g > r * 0.9 && g > b * 0.9;
+                    
+                    // Any abnormal color contrast (veins show as lines)
+                    const colorVariance = Math.abs(r - g) + Math.abs(g - b) + Math.abs(r - b);
+                    const highContrast = colorVariance > 40;
+                    
+                    // Calculate vein score - be aggressive
                     let veinScore = 0;
-                    if (hasBlue) veinScore += 0.5;
-                    if (hasGreenBlue) veinScore += 0.6;
-                    if (hasRed && isDark) veinScore += 0.7;
-                    if (hasPurple) veinScore += 0.5;
-                    if (hasPink) veinScore += 0.4;
+                    
+                    if (hasRed) veinScore += 0.7;
+                    if (hasPink) veinScore += 0.5;
+                    if (hasPurpleRed) veinScore += 0.6;
+                    if (hasBlue) veinScore += 0.6;
+                    if (hasGreen) veinScore += 0.4;
+                    if (highContrast) veinScore += 0.3;
+                    
+                    // Boost score for darker areas (veins are often darker)
+                    if (brightness < 180 && veinScore > 0) veinScore += 0.2;
                     
                     veinScore = Math.min(veinScore, 1);
                     
-                    // Blend with blurred version
-                    let blend = 0.3 + veinScore * 0.6;
-                    blend = Math.min(blend, 0.9);
+                    // AGGRESSIVE blending - almost fully replace with blurred version for veins
+                    let blend = 0.2; // Base smoothing
+                    blend += veinScore * 0.75; // Strong blend for veins
+                    blend = Math.min(blend, 0.95);
                     
+                    // Replace with clean blurred skin
                     orig[i] = r + (blur[i] - r) * blend;
                     orig[i + 1] = g + (blur[i + 1] - g) * blend;
                     orig[i + 2] = b + (blur[i + 2] - b) * blend;
                     
-                    // Color correction
-                    if (veinScore > 0.3) {
-                        const fix = veinScore * 0.5;
-                        if (hasRed || hasPink || hasPurple) {
-                            orig[i] = Math.max(0, orig[i] - 20 * fix);
-                            orig[i + 1] = Math.min(255, orig[i + 1] + 15 * fix);
-                        } else {
-                            orig[i] = Math.min(255, orig[i] + 25 * fix);
-                            orig[i + 2] = Math.max(0, orig[i + 2] - 30 * fix);
+                    // Strong color correction
+                    if (veinScore > 0.2) {
+                        const fix = veinScore * 0.8;
+                        
+                        if (hasRed || hasPink || hasPurpleRed) {
+                            // Red veins: neutralize red, add green
+                            orig[i] = Math.max(0, orig[i] - 40 * fix);
+                            orig[i + 1] = Math.min(255, orig[i + 1] + 25 * fix);
+                            orig[i + 2] = Math.min(255, orig[i + 2] + 10 * fix);
+                        } else if (hasBlue || hasGreen) {
+                            // Blue veins: warm up
+                            orig[i] = Math.min(255, orig[i] + 35 * fix);
+                            orig[i + 1] = Math.min(255, orig[i + 1] + 10 * fix);
+                            orig[i + 2] = Math.max(0, orig[i + 2] - 45 * fix);
                         }
                     }
                 }
@@ -716,9 +737,9 @@
                 ctx.putImageData(originalData, 0, 0);
             }
             
-            // Final smoothing
-            ctx.globalAlpha = 0.2;
-            ctx.filter = 'blur(2px)';
+            // Final smoothing pass
+            ctx.globalAlpha = 0.3;
+            ctx.filter = 'blur(3px)';
             ctx.drawImage(ctx.canvas, 0, 0);
             ctx.filter = 'none';
             ctx.globalAlpha = 1;
