@@ -754,19 +754,37 @@
                 const bb = blur[i + 2];
                 
                 // ===== VEIN DETECTION (within skin) =====
-                // Varicose veins appear greenish-blue or dark blue on skin
+                // Varicose veins: greenish-blue or dark blue
+                // Spider veins: RED, purple, pink networks
                 
+                // Blue/green veins (varicose)
                 const hasBlue = b > r * 0.75;
                 const hasGreenBlue = (g > r * 0.8 && b > r * 0.75);
-                const hasPurple = (b > g * 0.9 && r < 180);
-                const isDarker = brightness < 140;
+                
+                // RED/Purple veins (spider veins - telangiectasia)
+                // Spider veins show as red/purple thin lines on skin
+                const hasRed = r > g * 1.15 && r > b * 1.2;
+                const hasPurpleRed = r > g && b > g * 0.85 && r > 80;
+                const hasPink = r > g * 1.1 && r > b * 1.1 && brightness > 120;
+                
+                // Darker than surrounding skin = likely a vein
+                const isDarker = brightness < 150;
+                const isRedder = r > (g + b) / 2 * 1.1;
                 
                 // Calculate vein score
                 let veinScore = 0;
+                
+                // Blue veins
                 if (hasBlue) veinScore += 0.4;
                 if (hasGreenBlue) veinScore += 0.5;
-                if (hasPurple) veinScore += 0.3;
-                if (isDarker && (hasBlue || hasGreenBlue)) veinScore += 0.3;
+                
+                // Spider veins (RED)
+                if (hasRed && isDarker) veinScore += 0.6;
+                if (hasPurpleRed) veinScore += 0.5;
+                if (hasPink && isRedder) veinScore += 0.4;
+                
+                // General: any color that stands out from normal skin tone
+                if (isDarker && (hasBlue || hasGreenBlue || hasRed)) veinScore += 0.2;
                 
                 veinScore = Math.min(veinScore, 1);
                 
@@ -781,12 +799,22 @@
                 orig[i + 1] = g + (bg - g) * blendAmount;
                 orig[i + 2] = b + (bb - b) * blendAmount;
                 
-                // Color correction for veins: warm up the color
+                // Color correction for veins
                 if (veinScore > 0.2) {
                     const correction = veinScore * intensity * 0.7;
-                    orig[i] = Math.min(255, orig[i] + 35 * correction);
-                    orig[i + 1] = Math.min(255, orig[i + 1] + 15 * correction);
-                    orig[i + 2] = Math.max(0, orig[i + 2] - 40 * correction);
+                    
+                    // Different correction based on vein type
+                    if (hasRed || hasPurpleRed || hasPink) {
+                        // Red spider veins: reduce red, even out color
+                        orig[i] = Math.max(0, orig[i] - 25 * correction);      // Less red
+                        orig[i + 1] = Math.min(255, orig[i + 1] + 20 * correction); // More green
+                        orig[i + 2] = Math.min(255, orig[i + 2] + 10 * correction); // Slight blue
+                    } else {
+                        // Blue veins: warm up the color
+                        orig[i] = Math.min(255, orig[i] + 35 * correction);     // More red
+                        orig[i + 1] = Math.min(255, orig[i + 1] + 15 * correction); // Slight green
+                        orig[i + 2] = Math.max(0, orig[i + 2] - 40 * correction);   // Less blue
+                    }
                 }
             }
             
