@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VeinVanish™ - See Your Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 50%, #B69BE8 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Landing Screen */
+        #landing {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo h1 span {
+            font-weight: 300;
+        }
+
+        .logo .tm {
+            font-size: 1rem;
+            vertical-align: super;
+        }
+
+        .tagline {
+            color: rgba(255,255,255,0.95);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .hero-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .hero-card h2 {
+            color: #7B5DC3;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .hero-card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .hero-image {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #f0ebfa 0%, #e5ddf7 100%);
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(123,93,195,0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(123,93,195,0.5);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #7B5DC3;
+            border: 2px solid #7B5DC3;
+        }
+
+        /* Lead Capture Screen */
+        #leadCapture {
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .form-card h2 {
+            color: #7B5DC3;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .form-card .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #9B7ED9;
+        }
+
+        .form-card .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .back-link {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        /* Camera Screen */
+        #camera {
+            padding: 0;
+            background: #000;
+            position: relative;
+        }
+
+        .camera-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .camera-header h3 {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .camera-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #videoElement {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #canvasElement {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 30px 20px 50px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            z-index: 10;
+        }
+
+        .filter-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 25px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 100%);
+            border-color: transparent;
+        }
+
+        .intensity-slider {
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+
+        .intensity-label {
+            color: white;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .intensity-slider input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        .intensity-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .cta-container {
+            text-align: center;
+        }
+
+        .cta-container .btn {
+            padding: 14px 35px;
+        }
+
+        .camera-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .camera-message .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            max-width: 350px;
+            width: 100%;
+            text-align: center;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .modal h3 {
+            color: #7B5DC3;
+            margin-bottom: 10px;
+        }
+
+        .modal p {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+        }
+
+        /* Responsive */
+        @media (max-width: 380px) {
+            .logo h1 {
+                font-size: 2.5rem;
+            }
+            .hero-card, .form-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Screen -->
+    <div id="landing" class="screen active">
+        <div class="logo">
+            <h1><span>Vein</span>vanish<span class="tm">™</span></h1>
+        </div>
+        <p class="tagline">Let's make complex vein care simple!</p>
+        
+        <div class="hero-card">
+            <div class="hero-image">✨</div>
+            <h2>See Your Results</h2>
+            <p>Use our AR technology to preview what your legs could look like after VeinVanish treatment. It's like magic! ✨</p>
+            <button class="btn btn-primary" onclick="showScreen('leadCapture')">
+                Try VeinVanish
+            </button>
+        </div>
+    </div>
+
+    <!-- Lead Capture Screen -->
+    <div id="leadCapture" class="screen">
+        <div class="form-card">
+            <h2>Almost There! ✨</h2>
+            <p class="subtitle">Enter your info to try VeinVanish</p>
+            
+            <form id="leadForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    🎥 Open Camera
+                </button>
+            </form>
+        </div>
+        <a href="#" class="back-link" onclick="showScreen('landing'); return false;">← Back</a>
+    </div>
+
+    <!-- Camera Screen -->
+    <div id="camera" class="screen">
+        <div class="camera-header">
+            <h3>VeinVanish™ Preview</h3>
+            <button class="camera-close" onclick="stopCamera(); showScreen('landing');">✕</button>
+        </div>
+        
+        <div class="camera-container">
+            <video id="videoElement" autoplay playsinline muted></video>
+            <canvas id="canvasElement"></canvas>
+            <div id="cameraMessage" class="camera-message">
+                <div class="spinner"></div>
+                <p>Starting camera...</p>
+            </div>
+        </div>
+        
+        <div class="camera-controls">
+            <div class="filter-toggle">
+                <button class="filter-btn" id="btnBefore" onclick="setFilter('before')">Before</button>
+                <button class="filter-btn active" id="btnAfter" onclick="setFilter('after')">After ✨</button>
+            </div>
+            
+            <div class="intensity-slider">
+                <div class="intensity-label">
+                    <span>Intensity</span>
+                    <span id="intensityValue">70%</span>
+                </div>
+                <input type="range" id="intensityRange" min="0" max="100" value="70" oninput="updateIntensity(this.value)">
+            </div>
+            
+            <div class="cta-container">
+                <button class="btn btn-primary" onclick="showBookingModal()">
+                    Book Free Consultation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="bookingModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-icon">🎉</div>
+            <h3>You're All Set!</h3>
+            <p>A VeinVanish specialist will contact you shortly to schedule your free consultation.</p>
+            <button class="btn btn-primary" onclick="closeModal()">Done</button>
+        </div>
+    </div>
+
+    <script>
+        // Screen navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            if (screenId === 'camera') {
+                startCamera();
+            }
+        }
+
+        // Form handling
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Store lead data (in production, send to server)
+            console.log('Lead captured:', formData);
+            localStorage.setItem('veinvanish_lead', JSON.stringify(formData));
+            
+            // Show camera
+            showScreen('camera');
+        }
+
+        // Camera and filter variables
+        let video, canvas, ctx;
+        let filterEnabled = true;
+        let intensity = 0.7;
+        let animationId;
+        let stream;
+
+        async function startCamera() {
+            video = document.getElementById('videoElement');
+            canvas = document.getElementById('canvasElement');
+            ctx = canvas.getContext('2d', { willReadFrequently: true });
+            const message = document.getElementById('cameraMessage');
+
+            try {
+                // Request camera access (prefer back camera for legs)
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
+
+                video.srcObject = stream;
+                
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    message.style.display = 'none';
+                    processFrame();
+                };
+
+            } catch (err) {
+                console.error('Camera error:', err);
+                message.innerHTML = `
+                    <p>📷 Camera access needed</p>
+                    <p style="font-size: 0.85rem; margin-top: 10px; opacity: 0.8;">
+                        Please allow camera access to try VeinVanish
+                    </p>
+                `;
+            }
+        }
+
+        function stopCamera() {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        }
+
+        function processFrame() {
+            if (!video || video.paused || video.ended) {
+                animationId = requestAnimationFrame(processFrame);
+                return;
+            }
+
+            // Draw video frame to canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            if (filterEnabled && intensity > 0) {
+                applyVeinVanishFilter();
+            }
+
+            animationId = requestAnimationFrame(processFrame);
+        }
+
+        function applyVeinVanishFilter() {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            // Process pixels to reduce vein visibility
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                
+                // Convert to HSL for better color detection
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                const l = (max + min) / 2 / 255;
+                
+                let h = 0, s = 0;
+                if (max !== min) {
+                    const d = max - min;
+                    s = l > 0.5 ? d / (510 - max - min) : d / (max + min);
+                    
+                    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+                    else if (max === g) h = ((b - r) / d + 2) / 6;
+                    else h = ((r - g) / d + 4) / 6;
+                }
+                
+                // Detect vein-like colors (blue/purple tones in skin)
+                // Veins appear as blue (h: 0.55-0.75) or purple (h: 0.75-0.85)
+                // Also check for slightly desaturated red/pink with blue tint
+                const isVeinColor = (
+                    // Blue veins
+                    (h >= 0.5 && h <= 0.75 && s > 0.1 && l > 0.2 && l < 0.7) ||
+                    // Purple/reddish veins  
+                    (h >= 0.75 && h <= 0.95 && s > 0.15 && l > 0.25 && l < 0.65) ||
+                    // Dark blue/green visible veins
+                    (h >= 0.45 && h <= 0.55 && s > 0.15 && l > 0.15 && l < 0.5) ||
+                    // Detect by RGB ratio (blue higher than expected for skin)
+                    (b > r * 0.7 && b > g * 0.85 && l > 0.2 && l < 0.6)
+                );
+                
+                if (isVeinColor) {
+                    // Calculate how "veiny" this pixel is
+                    let veinStrength = 0;
+                    
+                    if (h >= 0.5 && h <= 0.75) {
+                        veinStrength = Math.max(veinStrength, s * 2);
+                    }
+                    if (b > r * 0.7) {
+                        veinStrength = Math.max(veinStrength, (b - r * 0.7) / 100);
+                    }
+                    
+                    veinStrength = Math.min(veinStrength, 1) * intensity;
+                    
+                    // Shift toward natural skin tone (warm, less blue)
+                    // Increase red, slightly increase green, reduce blue
+                    const skinShift = veinStrength * 0.4;
+                    
+                    data[i] = Math.min(255, r + (40 * skinShift));     // Add warmth
+                    data[i + 1] = Math.min(255, g + (15 * skinShift)); // Slight green
+                    data[i + 2] = Math.max(0, b - (35 * skinShift));   // Reduce blue
+                }
+            }
+            
+            // Apply slight smoothing effect for more natural look
+            ctx.putImageData(imageData, 0, 0);
+            
+            // Additional smoothing pass with low opacity
+            if (intensity > 0.3) {
+                ctx.globalAlpha = intensity * 0.15;
+                ctx.filter = 'blur(2px)';
+                ctx.drawImage(canvas, 0, 0);
+                ctx.filter = 'none';
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function setFilter(mode) {
+            filterEnabled = (mode === 'after');
+            document.getElementById('btnBefore').classList.toggle('active', !filterEnabled);
+            document.getElementById('btnAfter').classList.toggle('active', filterEnabled);
+        }
+
+        function updateIntensity(value) {
+            intensity = value / 100;
+            document.getElementById('intensityValue').textContent = value + '%';
+        }
+
+        function showBookingModal() {
+            document.getElementById('bookingModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('bookingModal').classList.remove('active');
+            stopCamera();
+            showScreen('landing');
+        }
+    </script>
+</body>
+</html>
