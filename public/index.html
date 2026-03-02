@@ -510,7 +510,7 @@
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-content">
             <div class="spinner"></div>
-            <p>Applying VeinVanish magic... ✨</p>
+            <p>AI is removing veins... ✨<br><small>(takes 10-15 seconds)</small></p>
         </div>
     </div>
 
@@ -563,7 +563,7 @@
             }
         });
 
-        function handleImage(file) {
+        async function handleImage(file) {
             if (!file.type.startsWith('image/')) {
                 alert('Please upload an image file');
                 return;
@@ -572,177 +572,41 @@
             // Show loading
             document.getElementById('loadingOverlay').classList.add('active');
 
+            // Store original as "before"
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    processImage(img);
-                };
-                img.src = e.target.result;
+            reader.onload = async (e) => {
+                document.getElementById('beforeImage').src = e.target.result;
+                
+                // Send to AI API
+                try {
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    
+                    const response = await fetch('/api/process-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success && result.imageUrl) {
+                        // Load the AI-processed image
+                        document.getElementById('afterImage').src = result.imageUrl;
+                        
+                        // Hide loading, show results
+                        document.getElementById('loadingOverlay').classList.remove('active');
+                        showScreen('results');
+                        initSlider();
+                    } else {
+                        throw new Error(result.error || 'Processing failed');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    document.getElementById('loadingOverlay').classList.remove('active');
+                    alert('Failed to process image: ' + error.message);
+                }
             };
             reader.readAsDataURL(file);
-        }
-
-        function processImage(img) {
-            const canvas = document.getElementById('processCanvas');
-            const ctx = canvas.getContext('2d');
-
-            // Set canvas size (limit max size for performance)
-            const maxSize = 1200;
-            let w = img.width;
-            let h = img.height;
-            
-            if (w > maxSize || h > maxSize) {
-                if (w > h) {
-                    h = (h / w) * maxSize;
-                    w = maxSize;
-                } else {
-                    w = (w / h) * maxSize;
-                    h = maxSize;
-                }
-            }
-
-            canvas.width = w;
-            canvas.height = h;
-
-            // Draw original
-            ctx.drawImage(img, 0, 0, w, h);
-            
-            // Store before image
-            const beforeDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-            document.getElementById('beforeImage').src = beforeDataUrl;
-
-            // Apply vein removal filter
-            applyVeinVanishFilter(ctx, w, h);
-
-            // Store after image
-            const afterDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-            document.getElementById('afterImage').src = afterDataUrl;
-
-            // Hide loading, show results
-            document.getElementById('loadingOverlay').classList.remove('active');
-            showScreen('results');
-            
-            // Initialize slider
-            initSlider();
-        }
-
-        function applyVeinVanishFilter(ctx, w, h) {
-            // 5 passes for aggressive removal
-            for (let pass = 0; pass < 5; pass++) {
-                
-                // Create heavily blurred version (clean skin reference)
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = w;
-                tempCanvas.height = h;
-                const tempCtx = tempCanvas.getContext('2d');
-                
-                tempCtx.drawImage(ctx.canvas, 0, 0);
-                // Heavy blur - this becomes our "clean" reference
-                tempCtx.filter = 'blur(20px)';
-                tempCtx.drawImage(tempCanvas, 0, 0);
-                tempCtx.filter = 'none';
-                
-                // Get pixel data
-                const originalData = ctx.getImageData(0, 0, w, h);
-                const blurredData = tempCtx.getImageData(0, 0, w, h);
-                const orig = originalData.data;
-                const blur = blurredData.data;
-                
-                for (let i = 0; i < orig.length; i += 4) {
-                    const r = orig[i];
-                    const g = orig[i + 1];
-                    const b = orig[i + 2];
-                    
-                    // Skin detection (broader range)
-                    const brightness = (r + g + b) / 3;
-                    const max = Math.max(r, g, b);
-                    const min = Math.min(r, g, b);
-                    
-                    let hue = 0;
-                    if (max !== min) {
-                        if (max === r) hue = 60 * ((g - b) / (max - min));
-                        else if (max === g) hue = 60 * (2 + (b - r) / (max - min));
-                        else hue = 60 * (4 + (r - g) / (max - min));
-                        if (hue < 0) hue += 360;
-                    }
-                    
-                    // Broad skin detection
-                    const isSkin = (
-                        brightness > 30 && brightness < 245 &&
-                        r > 30 && r >= b * 0.5
-                    );
-                    
-                    if (!isSkin) continue;
-                    
-                    // AGGRESSIVE vein detection
-                    // Red/pink spider veins
-                    const redExcess = r - Math.min(g, b);
-                    const hasRed = redExcess > 15 && r > g * 1.08;
-                    const hasPink = r > g * 1.05 && r > b * 1.05;
-                    const hasPurpleRed = r > g && b > g * 0.7;
-                    
-                    // Blue/green varicose veins
-                    const blueExcess = b - Math.min(r, g);
-                    const hasBlue = blueExcess > 10 || b > r * 0.8;
-                    const hasGreen = g > r * 0.9 && g > b * 0.9;
-                    
-                    // Any abnormal color contrast (veins show as lines)
-                    const colorVariance = Math.abs(r - g) + Math.abs(g - b) + Math.abs(r - b);
-                    const highContrast = colorVariance > 40;
-                    
-                    // Calculate vein score - be aggressive
-                    let veinScore = 0;
-                    
-                    if (hasRed) veinScore += 0.7;
-                    if (hasPink) veinScore += 0.5;
-                    if (hasPurpleRed) veinScore += 0.6;
-                    if (hasBlue) veinScore += 0.6;
-                    if (hasGreen) veinScore += 0.4;
-                    if (highContrast) veinScore += 0.3;
-                    
-                    // Boost score for darker areas (veins are often darker)
-                    if (brightness < 180 && veinScore > 0) veinScore += 0.2;
-                    
-                    veinScore = Math.min(veinScore, 1);
-                    
-                    // AGGRESSIVE blending - almost fully replace with blurred version for veins
-                    let blend = 0.2; // Base smoothing
-                    blend += veinScore * 0.75; // Strong blend for veins
-                    blend = Math.min(blend, 0.95);
-                    
-                    // Replace with clean blurred skin
-                    orig[i] = r + (blur[i] - r) * blend;
-                    orig[i + 1] = g + (blur[i + 1] - g) * blend;
-                    orig[i + 2] = b + (blur[i + 2] - b) * blend;
-                    
-                    // Strong color correction
-                    if (veinScore > 0.2) {
-                        const fix = veinScore * 0.8;
-                        
-                        if (hasRed || hasPink || hasPurpleRed) {
-                            // Red veins: neutralize red, add green
-                            orig[i] = Math.max(0, orig[i] - 40 * fix);
-                            orig[i + 1] = Math.min(255, orig[i + 1] + 25 * fix);
-                            orig[i + 2] = Math.min(255, orig[i + 2] + 10 * fix);
-                        } else if (hasBlue || hasGreen) {
-                            // Blue veins: warm up
-                            orig[i] = Math.min(255, orig[i] + 35 * fix);
-                            orig[i + 1] = Math.min(255, orig[i + 1] + 10 * fix);
-                            orig[i + 2] = Math.max(0, orig[i + 2] - 45 * fix);
-                        }
-                    }
-                }
-                
-                ctx.putImageData(originalData, 0, 0);
-            }
-            
-            // Final smoothing pass
-            ctx.globalAlpha = 0.3;
-            ctx.filter = 'blur(3px)';
-            ctx.drawImage(ctx.canvas, 0, 0);
-            ctx.filter = 'none';
-            ctx.globalAlpha = 1;
         }
 
         // Comparison slider
