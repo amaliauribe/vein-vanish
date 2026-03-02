@@ -500,8 +500,8 @@
         
         <div class="camera-controls">
             <div class="filter-toggle">
-                <button class="filter-btn" id="btnBefore" onclick="setFilter('before')">Before</button>
-                <button class="filter-btn active" id="btnAfter" onclick="setFilter('after')">After ✨</button>
+                <button class="filter-btn active" id="btnBefore" onclick="setFilter('before')">Before</button>
+                <button class="filter-btn" id="btnAfter" onclick="setFilter('after')">After ✨</button>
             </div>
             
             <div class="intensity-slider">
@@ -609,7 +609,7 @@
 
         // Camera and filter variables
         let video, canvas, ctx;
-        let filterEnabled = true;
+        let filterEnabled = false;  // Start with Before (no filter)
         let intensity = 0.7;
         let animationId;
         let stream;
