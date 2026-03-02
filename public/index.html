@@ -709,38 +709,71 @@
                 const g = orig[i + 1];
                 const b = orig[i + 2];
                 
+                // ===== SKIN DETECTION =====
+                // Only apply filter to skin-colored pixels
+                // Skin tones: R > G > B, with specific ranges
+                
+                // Convert to normalized values
+                const brightness = (r + g + b) / 3;
+                const max = Math.max(r, g, b);
+                const min = Math.min(r, g, b);
+                
+                // Calculate hue (0-360)
+                let hue = 0;
+                if (max !== min) {
+                    if (max === r) hue = 60 * ((g - b) / (max - min));
+                    else if (max === g) hue = 60 * (2 + (b - r) / (max - min));
+                    else hue = 60 * (4 + (r - g) / (max - min));
+                    if (hue < 0) hue += 360;
+                }
+                
+                // Skin detection criteria (works for various skin tones)
+                const isSkin = (
+                    // Hue in skin range (0-50 for most skin tones, including darker skin)
+                    (hue >= 0 && hue <= 50) &&
+                    // Red is dominant or close to dominant
+                    (r > 40 && r >= b) &&
+                    // Not too saturated (rules out red objects)
+                    (max - min < 180) &&
+                    // Brightness in reasonable range
+                    (brightness > 40 && brightness < 230) &&
+                    // Red-green relationship typical of skin
+                    (r > g * 0.7 && g > b * 0.6)
+                ) || (
+                    // Also detect skin with veins (slightly blue/purple tint)
+                    (r > 50 && brightness > 50 && brightness < 200) &&
+                    (r >= g * 0.6) &&
+                    (hue >= 0 && hue <= 60 || hue >= 300 && hue <= 360) // Include purplish
+                );
+                
+                // Skip non-skin pixels
+                if (!isSkin) continue;
+                
                 const br = blur[i];
                 const bg = blur[i + 1];
                 const bb = blur[i + 2];
                 
-                // Detect vein-like colors (blue, green-blue, purple tones)
-                // Varicose veins often appear greenish-blue or dark blue
-                const brightness = (r + g + b) / 3;
+                // ===== VEIN DETECTION (within skin) =====
+                // Varicose veins appear greenish-blue or dark blue on skin
                 
-                // Multiple vein detection methods
-                const hasBlue = b > r * 0.8;
-                const hasGreenBlue = (g > r * 0.85 && b > r * 0.8);
-                const hasPurple = (b > g && r > g * 0.9 && r < 180);
-                const isDark = brightness < 150;
-                const notTooLight = brightness > 30;
-                const notTooDark = brightness < 200;
+                const hasBlue = b > r * 0.75;
+                const hasGreenBlue = (g > r * 0.8 && b > r * 0.75);
+                const hasPurple = (b > g * 0.9 && r < 180);
+                const isDarker = brightness < 140;
                 
-                // Color difference from "normal" skin (skin is usually r > g > b)
-                const abnormalColor = (b >= r * 0.75) || (g >= r * 0.95 && b >= r * 0.7);
-                
-                // Calculate how "veiny" this pixel looks
+                // Calculate vein score
                 let veinScore = 0;
-                if (hasBlue && isDark) veinScore += 0.4;
+                if (hasBlue) veinScore += 0.4;
                 if (hasGreenBlue) veinScore += 0.5;
                 if (hasPurple) veinScore += 0.3;
-                if (abnormalColor && notTooLight && notTooDark) veinScore += 0.3;
+                if (isDarker && (hasBlue || hasGreenBlue)) veinScore += 0.3;
                 
                 veinScore = Math.min(veinScore, 1);
                 
-                // Blend factor: higher for veins, lower for normal skin
-                // This makes veins get more of the blurred (smooth) version
-                let blendAmount = intensity * 0.5; // Base smoothing for all skin
-                blendAmount += veinScore * intensity * 0.5; // Extra smoothing for veins
+                // ===== APPLY SMOOTHING =====
+                // More blur for veins, less for normal skin
+                let blendAmount = intensity * 0.4; // Base smoothing for skin
+                blendAmount += veinScore * intensity * 0.55; // Extra for veins
                 blendAmount = Math.min(blendAmount, 0.95);
                 
                 // Blend original with blurred
@@ -748,23 +781,16 @@
                 orig[i + 1] = g + (bg - g) * blendAmount;
                 orig[i + 2] = b + (bb - b) * blendAmount;
                 
-                // Color correction: shift vein colors toward skin tone
+                // Color correction for veins: warm up the color
                 if (veinScore > 0.2) {
-                    const correction = veinScore * intensity * 0.6;
-                    orig[i] = Math.min(255, orig[i] + 30 * correction);     // Add red (warmth)
-                    orig[i + 1] = Math.min(255, orig[i + 1] + 15 * correction); // Slight green
-                    orig[i + 2] = Math.max(0, orig[i + 2] - 35 * correction);   // Remove blue
+                    const correction = veinScore * intensity * 0.7;
+                    orig[i] = Math.min(255, orig[i] + 35 * correction);
+                    orig[i + 1] = Math.min(255, orig[i + 1] + 15 * correction);
+                    orig[i + 2] = Math.max(0, orig[i + 2] - 40 * correction);
                 }
             }
             
             ctx.putImageData(originalData, 0, 0);
-            
-            // Final touch: slight overall smoothing
-            ctx.globalAlpha = intensity * 0.15;
-            ctx.filter = 'blur(2px)';
-            ctx.drawImage(canvas, 0, 0);
-            ctx.filter = 'none';
-            ctx.globalAlpha = 1;
         }
 
         function setFilter(mode) {
