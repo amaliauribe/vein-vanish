@@ -680,83 +680,90 @@
         }
 
         function applyVeinVanishFilter() {
-            // Step 1: Apply skin smoothing blur first
-            ctx.globalAlpha = intensity * 0.4;
-            ctx.filter = `blur(${3 + intensity * 2}px)`;
-            ctx.drawImage(canvas, 0, 0);
-            ctx.filter = 'none';
-            ctx.globalAlpha = 1;
+            const w = canvas.width;
+            const h = canvas.height;
             
-            // Step 2: Get image data and process colors
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            const width = canvas.width;
+            // Create a temporary canvas for the blurred version
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = w;
+            tempCanvas.height = h;
+            const tempCtx = tempCanvas.getContext('2d');
             
-            for (let i = 0; i < data.length; i += 4) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
+            // Copy current frame to temp canvas
+            tempCtx.drawImage(canvas, 0, 0);
+            
+            // Apply heavy blur to temp canvas (this will be our "clean skin" layer)
+            tempCtx.filter = `blur(${8 + intensity * 12}px)`;
+            tempCtx.drawImage(tempCanvas, 0, 0);
+            tempCtx.filter = 'none';
+            
+            // Get pixel data from both canvases
+            const originalData = ctx.getImageData(0, 0, w, h);
+            const blurredData = tempCtx.getImageData(0, 0, w, h);
+            const orig = originalData.data;
+            const blur = blurredData.data;
+            
+            // Process each pixel
+            for (let i = 0; i < orig.length; i += 4) {
+                const r = orig[i];
+                const g = orig[i + 1];
+                const b = orig[i + 2];
                 
-                // Calculate color metrics
-                const avg = (r + g + b) / 3;
-                const brightness = (r * 0.299 + g * 0.587 + b * 0.114);
+                const br = blur[i];
+                const bg = blur[i + 1];
+                const bb = blur[i + 2];
                 
-                // Detect vein colors more aggressively
-                // Veins appear as: blue, purple, red-purple, greenish-blue
-                const blueExcess = b - Math.min(r, g);
-                const purpleish = (b > g * 0.9) && (r < b * 1.2);
-                const bluish = b > r * 0.85 && b > g * 0.9;
-                const reddishPurple = r > g && b > g * 0.8 && r < 200;
-                const greenishBlue = b > r * 0.9 && g > r * 0.9 && b > 50;
+                // Detect vein-like colors (blue, green-blue, purple tones)
+                // Varicose veins often appear greenish-blue or dark blue
+                const brightness = (r + g + b) / 3;
                 
-                // Is this likely a vein?
-                const isVein = (bluish || purpleish || reddishPurple || greenishBlue) && 
-                              brightness > 40 && brightness < 200;
+                // Multiple vein detection methods
+                const hasBlue = b > r * 0.8;
+                const hasGreenBlue = (g > r * 0.85 && b > r * 0.8);
+                const hasPurple = (b > g && r > g * 0.9 && r < 180);
+                const isDark = brightness < 150;
+                const notTooLight = brightness > 30;
+                const notTooDark = brightness < 200;
                 
-                if (isVein) {
-                    // Calculate vein intensity
-                    let veinAmount = 0;
-                    if (blueExcess > 0) veinAmount = Math.min(blueExcess / 50, 1);
-                    if (purpleish) veinAmount = Math.max(veinAmount, 0.5);
-                    if (reddishPurple) veinAmount = Math.max(veinAmount, 0.4);
-                    
-                    veinAmount *= intensity;
-                    
-                    // Blend toward surrounding skin tone (warmer, more uniform)
-                    // Reduce blue/purple, add warmth
-                    const correction = veinAmount * 0.7;
-                    
-                    data[i] = Math.min(255, r + 35 * correction);      // More red (warmth)
-                    data[i + 1] = Math.min(255, g + 25 * correction);  // More green
-                    data[i + 2] = Math.max(0, b - 45 * correction);    // Less blue
-                }
+                // Color difference from "normal" skin (skin is usually r > g > b)
+                const abnormalColor = (b >= r * 0.75) || (g >= r * 0.95 && b >= r * 0.7);
                 
-                // General skin smoothing - reduce contrast in skin tones
-                const isSkinTone = r > 60 && r > b && r > g * 0.8 && brightness > 50 && brightness < 220;
-                if (isSkinTone) {
-                    // Subtle evening out
-                    const eveningFactor = intensity * 0.15;
-                    data[i] = r + (avg - r) * eveningFactor;
-                    data[i + 1] = g + (avg - g) * eveningFactor;
-                    data[i + 2] = b + (avg - b) * eveningFactor;
+                // Calculate how "veiny" this pixel looks
+                let veinScore = 0;
+                if (hasBlue && isDark) veinScore += 0.4;
+                if (hasGreenBlue) veinScore += 0.5;
+                if (hasPurple) veinScore += 0.3;
+                if (abnormalColor && notTooLight && notTooDark) veinScore += 0.3;
+                
+                veinScore = Math.min(veinScore, 1);
+                
+                // Blend factor: higher for veins, lower for normal skin
+                // This makes veins get more of the blurred (smooth) version
+                let blendAmount = intensity * 0.5; // Base smoothing for all skin
+                blendAmount += veinScore * intensity * 0.5; // Extra smoothing for veins
+                blendAmount = Math.min(blendAmount, 0.95);
+                
+                // Blend original with blurred
+                orig[i] = r + (br - r) * blendAmount;
+                orig[i + 1] = g + (bg - g) * blendAmount;
+                orig[i + 2] = b + (bb - b) * blendAmount;
+                
+                // Color correction: shift vein colors toward skin tone
+                if (veinScore > 0.2) {
+                    const correction = veinScore * intensity * 0.6;
+                    orig[i] = Math.min(255, orig[i] + 30 * correction);     // Add red (warmth)
+                    orig[i + 1] = Math.min(255, orig[i + 1] + 15 * correction); // Slight green
+                    orig[i + 2] = Math.max(0, orig[i + 2] - 35 * correction);   // Remove blue
                 }
             }
             
-            ctx.putImageData(imageData, 0, 0);
+            ctx.putImageData(originalData, 0, 0);
             
-            // Step 3: Final smoothing pass
-            ctx.globalAlpha = intensity * 0.25;
+            // Final touch: slight overall smoothing
+            ctx.globalAlpha = intensity * 0.15;
             ctx.filter = 'blur(2px)';
             ctx.drawImage(canvas, 0, 0);
             ctx.filter = 'none';
-            ctx.globalAlpha = 1;
-            
-            // Step 4: Slight saturation reduction for cleaner look
-            ctx.globalCompositeOperation = 'saturation';
-            ctx.globalAlpha = intensity * 0.2;
-            ctx.fillStyle = '#808080';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.globalCompositeOperation = 'source-over';
             ctx.globalAlpha = 1;
         }
 
