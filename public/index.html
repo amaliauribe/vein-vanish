@@ -3,11 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VeinVanish™ - See Your Results</title>
+    <title>VeinVanish™ - Reveal Flawless Legs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --french-mauve: #574dd6;
+            --grape: #6140b2;
+            --magnolia: #f4f1f9;
+            --white: #ffffff;
+            --dark: #1a1a2e;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -16,9 +24,9 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 50%, #B69BE8 100%);
+            background: linear-gradient(135deg, var(--french-mauve) 0%, var(--grape) 100%);
             min-height: 100vh;
-            color: #333;
+            color: var(--dark);
             overflow-x: hidden;
         }
 
@@ -52,39 +60,43 @@
         }
 
         .logo h1 {
-            font-size: 3rem;
+            font-size: 3.2rem;
             font-weight: 700;
             color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 15px rgba(0,0,0,0.2);
+            line-height: 1.1;
         }
 
-        .logo h1 span {
+        .logo h1 .vein {
             font-weight: 300;
+            font-style: italic;
         }
 
         .logo .tm {
-            font-size: 1rem;
+            font-size: 0.9rem;
             vertical-align: super;
+            font-style: normal;
         }
 
         .tagline {
             color: rgba(255,255,255,0.95);
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             margin-bottom: 40px;
-            font-weight: 300;
+            font-weight: 400;
+            line-height: 1.4;
         }
 
         .hero-card {
-            background: white;
+            background: var(--white);
             border-radius: 24px;
             padding: 40px 30px;
             max-width: 380px;
             width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
         }
 
         .hero-card h2 {
-            color: #7B5DC3;
+            color: var(--grape);
             font-size: 1.5rem;
             margin-bottom: 15px;
         }
@@ -97,15 +109,15 @@
         }
 
         .hero-image {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #f0ebfa 0%, #e5ddf7 100%);
+            width: 100px;
+            height: 100px;
+            background: var(--magnolia);
             border-radius: 50%;
             margin: 0 auto 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 2.8rem;
         }
 
         .btn {
@@ -122,90 +134,20 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 100%);
+            background: linear-gradient(135deg, var(--french-mauve) 0%, var(--grape) 100%);
             color: white;
-            box-shadow: 0 8px 25px rgba(123,93,195,0.4);
+            box-shadow: 0 8px 25px rgba(97,64,178,0.4);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(123,93,195,0.5);
+            box-shadow: 0 12px 35px rgba(97,64,178,0.5);
         }
 
         .btn-secondary {
-            background: white;
-            color: #7B5DC3;
-            border: 2px solid #7B5DC3;
-        }
-
-        /* Lead Capture Screen */
-        #leadCapture {
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
-        }
-
-        .form-card {
-            background: white;
-            border-radius: 24px;
-            padding: 40px 30px;
-            max-width: 380px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        }
-
-        .form-card h2 {
-            color: #7B5DC3;
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .form-card .subtitle {
-            color: #888;
-            font-size: 0.9rem;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #555;
-            margin-bottom: 8px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e8e8e8;
-            border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #9B7ED9;
-        }
-
-        .form-card .btn {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .back-link {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            font-size: 0.9rem;
-            margin-top: 20px;
-            display: inline-block;
+            background: var(--white);
+            color: var(--grape);
+            border: 2px solid var(--grape);
         }
 
         /* Camera Screen */
@@ -221,7 +163,7 @@
             left: 0;
             right: 0;
             padding: 20px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
             z-index: 10;
             display: flex;
             justify-content: space-between;
@@ -238,11 +180,12 @@
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             cursor: pointer;
+            backdrop-filter: blur(10px);
         }
 
         .camera-container {
@@ -275,38 +218,40 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 30px 20px 50px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            padding: 25px 20px 45px;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
             z-index: 10;
         }
 
         .filter-toggle {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 25px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
 
         .filter-btn {
-            padding: 12px 24px;
+            padding: 12px 28px;
             border: 2px solid rgba(255,255,255,0.3);
             background: rgba(255,255,255,0.1);
             color: white;
             border-radius: 25px;
             font-family: 'Poppins', sans-serif;
             font-size: 0.9rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .filter-btn.active {
-            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 100%);
+            background: linear-gradient(135deg, var(--french-mauve) 0%, var(--grape) 100%);
             border-color: transparent;
         }
 
         .intensity-slider {
-            margin-bottom: 25px;
-            padding: 0 20px;
+            margin-bottom: 20px;
+            padding: 0 15px;
         }
 
         .intensity-label {
@@ -327,10 +272,10 @@
 
         .intensity-slider input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 100%);
+            background: linear-gradient(135deg, var(--french-mauve) 0%, var(--grape) 100%);
             cursor: pointer;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
@@ -367,6 +312,89 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Lead Capture Screen */
+        #leadCapture {
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .form-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 40px 30px;
+            max-width: 380px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .form-card .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--french-mauve) 0%, var(--grape) 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .form-card h2 {
+            color: var(--grape);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .form-card .subtitle {
+            color: #666;
+            font-size: 0.95rem;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--french-mauve);
+        }
+
+        .form-card .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .skip-link {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
         /* Success Modal */
         .modal-overlay {
             display: none;
@@ -387,7 +415,7 @@
         }
 
         .modal {
-            background: white;
+            background: var(--white);
             border-radius: 24px;
             padding: 40px 30px;
             max-width: 350px;
@@ -404,7 +432,7 @@
         .modal-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #7B5DC3 0%, #9B7ED9 100%);
+            background: linear-gradient(135deg, var(--french-mauve) 0%, var(--grape) 100%);
             border-radius: 50%;
             margin: 0 auto 20px;
             display: flex;
@@ -414,7 +442,7 @@
         }
 
         .modal h3 {
-            color: #7B5DC3;
+            color: var(--grape);
             margin-bottom: 10px;
         }
 
@@ -422,12 +450,13 @@
             color: #666;
             font-size: 0.95rem;
             margin-bottom: 25px;
+            line-height: 1.5;
         }
 
         /* Responsive */
         @media (max-width: 380px) {
             .logo h1 {
-                font-size: 2.5rem;
+                font-size: 2.6rem;
             }
             .hero-card, .form-card {
                 padding: 30px 20px;
@@ -439,52 +468,25 @@
     <!-- Landing Screen -->
     <div id="landing" class="screen active">
         <div class="logo">
-            <h1><span>Vein</span>vanish<span class="tm">™</span></h1>
+            <h1><span class="vein">Vein</span>vanish<span class="tm">™</span></h1>
         </div>
-        <p class="tagline">Let's make complex vein care simple!</p>
+        <p class="tagline">Reveal flawless legs.<br>Feel unstoppable.</p>
         
         <div class="hero-card">
-            <div class="hero-image">✨</div>
+            <div class="hero-image">📸</div>
             <h2>See Your Results</h2>
-            <p>Use our AR technology to preview what your legs could look like after VeinVanish treatment. It's like magic! ✨</p>
-            <button class="btn btn-primary" onclick="showScreen('leadCapture')">
-                Try VeinVanish
+            <p>Use our AR camera to preview what your legs could look like after VeinVanish treatment. It's like magic! ✨</p>
+            <button class="btn btn-primary" onclick="showScreen('camera')">
+                Let's see more
             </button>
         </div>
-    </div>
-
-    <!-- Lead Capture Screen -->
-    <div id="leadCapture" class="screen">
-        <div class="form-card">
-            <h2>Almost There! ✨</h2>
-            <p class="subtitle">Enter your info to try VeinVanish</p>
-            
-            <form id="leadForm" onsubmit="handleFormSubmit(event)">
-                <div class="form-group">
-                    <label for="name">Full Name</label>
-                    <input type="text" id="name" name="name" placeholder="Enter your name" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
-                </div>
-                <button type="submit" class="btn btn-primary">
-                    🎥 Open Camera
-                </button>
-            </form>
-        </div>
-        <a href="#" class="back-link" onclick="showScreen('landing'); return false;">← Back</a>
     </div>
 
     <!-- Camera Screen -->
     <div id="camera" class="screen">
         <div class="camera-header">
             <h3>VeinVanish™ Preview</h3>
-            <button class="camera-close" onclick="stopCamera(); showScreen('landing');">✕</button>
+            <button class="camera-close" onclick="closeCamera()">✕</button>
         </div>
         
         <div class="camera-container">
@@ -511,20 +513,48 @@
             </div>
             
             <div class="cta-container">
-                <button class="btn btn-primary" onclick="showBookingModal()">
-                    Book Free Consultation
+                <button class="btn btn-primary" onclick="closeCamera()">
+                    I Love It! Book Now
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Lead Capture Screen (shows after camera) -->
+    <div id="leadCapture" class="screen">
+        <div class="form-card">
+            <div class="success-icon">✨</div>
+            <h2>Love What You See?</h2>
+            <p class="subtitle">Book your free consultation and let's make those results real!</p>
+            
+            <form id="leadForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    Book Free Consultation
+                </button>
+            </form>
+        </div>
+        <a href="#" class="skip-link" onclick="showScreen('landing'); return false;">Maybe later</a>
+    </div>
+
     <!-- Success Modal -->
-    <div id="bookingModal" class="modal-overlay">
+    <div id="successModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-icon">🎉</div>
             <h3>You're All Set!</h3>
             <p>A VeinVanish specialist will contact you shortly to schedule your free consultation.</p>
-            <button class="btn btn-primary" onclick="closeModal()">Done</button>
+            <button class="btn btn-primary" onclick="closeSuccessModal()">Done</button>
         </div>
     </div>
 
@@ -537,6 +567,12 @@
             if (screenId === 'camera') {
                 startCamera();
             }
+        }
+
+        // Close camera and go to lead form
+        function closeCamera() {
+            stopCamera();
+            showScreen('leadCapture');
         }
 
         // Form handling
@@ -553,8 +589,22 @@
             console.log('Lead captured:', formData);
             localStorage.setItem('veinvanish_lead', JSON.stringify(formData));
             
-            // Show camera
-            showScreen('camera');
+            // Try to send to server
+            fetch('/api/leads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            }).catch(err => console.log('Server not available, stored locally'));
+            
+            // Show success modal
+            document.getElementById('successModal').classList.add('active');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('active');
+            showScreen('landing');
+            // Reset form
+            document.getElementById('leadForm').reset();
         }
 
         // Camera and filter variables
@@ -593,7 +643,8 @@
             } catch (err) {
                 console.error('Camera error:', err);
                 message.innerHTML = `
-                    <p>📷 Camera access needed</p>
+                    <p style="font-size: 1.2rem; margin-bottom: 10px;">📷</p>
+                    <p>Camera access needed</p>
                     <p style="font-size: 0.85rem; margin-top: 10px; opacity: 0.8;">
                         Please allow camera access to try VeinVanish
                     </p>
@@ -604,9 +655,11 @@
         function stopCamera() {
             if (animationId) {
                 cancelAnimationFrame(animationId);
+                animationId = null;
             }
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
+                stream = null;
             }
         }
 
@@ -652,8 +705,6 @@
                 }
                 
                 // Detect vein-like colors (blue/purple tones in skin)
-                // Veins appear as blue (h: 0.55-0.75) or purple (h: 0.75-0.85)
-                // Also check for slightly desaturated red/pink with blue tint
                 const isVeinColor = (
                     // Blue veins
                     (h >= 0.5 && h <= 0.75 && s > 0.1 && l > 0.2 && l < 0.7) ||
@@ -679,22 +730,20 @@
                     veinStrength = Math.min(veinStrength, 1) * intensity;
                     
                     // Shift toward natural skin tone (warm, less blue)
-                    // Increase red, slightly increase green, reduce blue
-                    const skinShift = veinStrength * 0.4;
+                    const skinShift = veinStrength * 0.45;
                     
-                    data[i] = Math.min(255, r + (40 * skinShift));     // Add warmth
-                    data[i + 1] = Math.min(255, g + (15 * skinShift)); // Slight green
-                    data[i + 2] = Math.max(0, b - (35 * skinShift));   // Reduce blue
+                    data[i] = Math.min(255, r + (45 * skinShift));     // Add warmth
+                    data[i + 1] = Math.min(255, g + (20 * skinShift)); // Slight green
+                    data[i + 2] = Math.max(0, b - (40 * skinShift));   // Reduce blue
                 }
             }
             
-            // Apply slight smoothing effect for more natural look
             ctx.putImageData(imageData, 0, 0);
             
-            // Additional smoothing pass with low opacity
+            // Additional smoothing pass for more natural look
             if (intensity > 0.3) {
-                ctx.globalAlpha = intensity * 0.15;
-                ctx.filter = 'blur(2px)';
+                ctx.globalAlpha = intensity * 0.12;
+                ctx.filter = 'blur(1.5px)';
                 ctx.drawImage(canvas, 0, 0);
                 ctx.filter = 'none';
                 ctx.globalAlpha = 1;
@@ -710,16 +759,6 @@
         function updateIntensity(value) {
             intensity = value / 100;
             document.getElementById('intensityValue').textContent = value + '%';
-        }
-
-        function showBookingModal() {
-            document.getElementById('bookingModal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('bookingModal').classList.remove('active');
-            stopCamera();
-            showScreen('landing');
         }
     </script>
 </body>
